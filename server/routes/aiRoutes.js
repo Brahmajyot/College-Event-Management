@@ -1,6 +1,6 @@
 import express from "express";
 import { generateEventDetails } from "../controllers/aiController.js";
-import { requireAuth } from "../middleware/authMiddleware.js";
+import { requireAuth } from "../middleware/authMiddleware.js"; 
 
 const router = express.Router();
 

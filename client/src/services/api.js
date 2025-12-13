@@ -6,33 +6,30 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 api.interceptors.request.use(
   async (config) => {
     try {
-   
       const token = await window.Clerk?.session?.getToken();
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (error) {
-      console.error("Error fetching Clerk token:", error);
+      console.error("Clerk token error:", error);
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
-
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.error("Unauthorized! Redirecting to login...");
-     
-    }
+    console.error(
+      "❌ API ERROR:",
+      error.response?.data?.message || error.message
+    );
     return Promise.reject(error);
   }
 );

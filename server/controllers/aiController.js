@@ -1,50 +1,43 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generateEventDetails = async (req, res) => {
-  const { title, category, mood } = req.body;
+  console.log("--------------------------------");
+  console.log("🤖 Gemini Controller Hit");
 
-  if (!title || !category) {
-    return res.status(400).json({ message: "Title and Category are required" });
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ message: "GEMINI_API_KEY missing" });
   }
 
-  try {
-    
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const { title, category, mood } = req.body;
 
-    
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.0-pro" 
+    });
+
     const prompt = `
-      You are an event management assistant.
-      Write a compelling, professional, yet exciting 2-sentence description for a college event.
-      
-      Details:
-      - Event Title: "${title}"
-      - Category: ${category}
-      - Mood: ${mood || "Energetic"}
-      - Target Audience: University Students
-      
-      Output only the description text. Do not add quotes or labels.
+      Write a short, exciting 2-sentence description for a college event.
+      Title: ${title}
+      Category: ${category}
+      Mood: ${mood || "Exciting"}
     `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
+    console.log("✅ AI Response:", text);
 
-    res.status(200).json({
-      success: true,
+    return res.status(200).json({
       description: text.trim(),
     });
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    res.status(500).json({ 
-      message: "Failed to generate AI content",
-      error: error.message 
+    console.error("❌ GEMINI AI ERROR:", error);
+    return res.status(200).json({
+      description: `Join us for ${title}! It will be an amazing ${category} event that you don't want to miss. (AI temporarily unavailable)`,
     });
   }
 };

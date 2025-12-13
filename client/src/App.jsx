@@ -2,19 +2,23 @@ import { Routes, Route } from "react-router-dom";
 import { SignedIn, SignedOut, RedirectToSignIn, SignIn } from "@clerk/clerk-react";
 import { Toaster } from "react-hot-toast";
 
+// Components
 import Navbar from "./components/Navbar";
 import Background3D from "./components/Background3D";
 
+// Pages (Make sure these files exist in src/pages/)
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
-import CreateEvent from "./pages/CreateEvent"; 
+import CreateEvent from "./pages/CreateEvent";
 import EventDetails from "./pages/EventDetails";
 
 function App() {
   return (
-    <div className="relative min-h-screen font-sans">
+    <div className="relative min-h-screen font-sans text-white">
+      {/* 1. Global 3D Background */}
       <Background3D />
 
+      {/* 2. Notifications */}
       <Toaster 
         position="top-center" 
         toastOptions={{
@@ -26,11 +30,14 @@ function App() {
         }}
       />
 
+      {/* 3. Navigation */}
       <Navbar />
 
+      {/* 4. Page Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/events/:id" element={<EventDetails />} />
+        
+        {/* Clerk Auth Page */}
         <Route 
           path="/sign-in/*" 
           element={
@@ -48,6 +55,7 @@ function App() {
           } 
         />
 
+        {/* Private Routes */}
         <Route 
           path="/dashboard" 
           element={
@@ -63,6 +71,16 @@ function App() {
           element={
             <>
               <SignedIn><CreateEvent /></SignedIn>
+              <SignedOut><RedirectToSignIn /></SignedOut>
+            </>
+          } 
+        />
+
+        <Route 
+          path="/events/:id" 
+          element={
+            <>
+              <SignedIn><EventDetails /></SignedIn>
               <SignedOut><RedirectToSignIn /></SignedOut>
             </>
           } 
